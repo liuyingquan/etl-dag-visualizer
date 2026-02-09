@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETL调度任务依赖关系图</title>
+    <!-- Element Plus 样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <!-- G6 CDN -->
+    <script src="https://unpkg.com/@antv/g6@4.8.0/dist/g6.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        overflow: hidden;
+      }
+      
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 加载屏幕 -->
+    <div id="loading-screen">
+      <div class="loading-spinner"></div>
+      <div>正在加载应用...</div>
+    </div>
+    
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+    
+    <script>
+      // 检查G6是否加载成功
+      function checkG6Loaded() {
+        if (window.G6) {
+          console.log('G6 loaded successfully:', G6.version);
+          // 隐藏加载屏幕
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+        } else {
+          console.warn('G6 not loaded yet, retrying...');
+          setTimeout(checkG6Loaded, 100);
+        }
+      }
+      
+      // 启动检查
+      setTimeout(checkG6Loaded, 100);
+      
+      // 设置超时，如果10秒后还没加载，就隐藏加载屏幕
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen && loadingScreen.style.display !== 'none') {
+          console.error('G6 failed to load within timeout');
+          loadingScreen.innerHTML = '<div>加载失败，请刷新页面或检查网络</div>';
+          loadingScreen.style.background = '#f5222d';
+        }
+      }, 10000);
+    </script>
+  </body>
+</html>
